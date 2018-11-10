@@ -1,6 +1,8 @@
 package service
 
 import (
+	"log"
+	"net"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -23,7 +25,13 @@ func Proxy(res http.ResponseWriter, req *http.Request) {
 	req.Header.Set("X-Forwarded-Host", req.Header.Get("Host"))
 	req.Host = targetUrl.Host
 
-	go processIp(req)
+	go processIpStats(req)
+
+	ip, _, _ := net.SplitHostPort(req.RemoteAddr)
+
+	if BlackListIPs[ip] {
+		log.Printf("IP: %s, You are blocked!!!!", ip)
+	}
 
 	//Adding Header example
 	test := req.Header.Get("GoProx")
@@ -32,9 +40,9 @@ func Proxy(res http.ResponseWriter, req *http.Request) {
 	proxy.ServeHTTP(res, req)
 }
 
-func processIp(r *http.Request) {
-	//ip, _, _ := net.SplitHostPort(r.RemoteAddr)
-	CacheClient.SaveVisit(r.RemoteAddr)
+func processIpStats(r *http.Request) {
+	ip, _, _ := net.SplitHostPort(r.RemoteAddr)
+	CacheClient.SaveVisit(ip)
 }
 
 //func changeIPAddress(r *http.Request) {

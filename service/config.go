@@ -15,6 +15,11 @@ var RequestFrequency int
 var CacheClient RedisClient
 
 func Config(conf *Configuration){
+	//Initialize Maps
+	WhiteListIPs = make(map[string]bool)
+	BlackListIPs = make(map[string]bool)
+
+
 	viper.SetConfigName("config")
 	viper.AddConfigPath(".")
 

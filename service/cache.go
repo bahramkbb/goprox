@@ -59,18 +59,48 @@ func (rc *RedisClient) SaveVisit(ip string) (bool, error) {
 	}
 }
 
-func (rc *RedisClient) GetAllIps() []string {
+func (rc *RedisClient) AddIpToSet(ip string, setName string) (bool, error) {
+	// Get a connection
+	conn := rc.pool.Get()
+	defer conn.Close()
+
+	res, err := conn.Do("SADD", setName, ip)
+
+	if err != nil {
+		println(res)
+		return true, nil
+	} else {
+		return false, err
+	}
+}
+
+func (rc *RedisClient) GetIpSet(setName string) []string {
 	var ips []string
 
 	// Get a connection
 	conn := rc.pool.Get()
 	defer conn.Close()
 
-	ips, err := redis.Strings(conn.Do("SMEMBERS", "ips"))
+	ips, err := redis.Strings(conn.Do("SMEMBERS", setName))
 	if err != nil {
 		log.Printf("error fetching ips from redis : %v", err)
 		return nil
 	}
 
 	return ips
+}
+
+func (rc *RedisClient) GetIPVisitCount(ip string) int {
+	// Get a connection
+	conn := rc.pool.Get()
+	defer conn.Close()
+
+	res, err := redis.Int(conn.Do("GET", "ip:" + ip))
+
+	if err != nil {
+		log.Printf("error fetching ip visits from redis : %v", err)
+		return 0
+	}
+
+	return res
 }

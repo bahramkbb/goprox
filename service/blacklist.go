@@ -9,10 +9,21 @@ func BlacklistProcessing(){
 	for {
 		time.Sleep(10 * time.Second)
 
-		log.Print("Getting all Ips...")
+		log.Print("Processing all Ips to blacklist...")
+		for _, val := range CacheClient.GetIpSet("ips") {
+			count := CacheClient.GetIPVisitCount(val)
 
-		test := CacheClient.GetAllIps()
+			if count > Configs.RateLimit.Rpm {
+				log.Printf("Blacklisting IP: %s, with %d visits.", val, count)
 
-		log.Print(test)
+				CacheClient.AddIpToSet(val, "blacklist")
+			}
+		}
+
+		log.Print("Updating Ip Blacklist...")
+		for _, val := range CacheClient.GetIpSet("blacklist") {
+			BlackListIPs[val] = true
+		}
+
 	}
 }
