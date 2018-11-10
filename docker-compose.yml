@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+    goprox:
+      image: alpine:3.8
+      restart: always
+      ports:
+        - "8000:8000"
+      volumes:
+        - "./:/app"
+        - "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt"
+      working_dir: /app
+      command: ["/app/goprox"]
+    # In memory database used for caching
+    redis:
+      image: sickp/alpine-redis:3.2.2
+      restart: unless-stopped
+      ports:
+        - "6379:6379"
