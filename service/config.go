@@ -40,8 +40,9 @@ func loadConfig(conf *Configuration) {
 		log.Fatalf("unable to decode into struct, %v", err)
 	}
 
-	log.Printf("Running on Port: %d\nTarget Url: %s\nRPM Limit: %d\nWhitelist: %s\n",
-		conf.Server.Port,
+	log.Printf("Running Https: %t\nCerts Location: %s\nTarget Url: %s\nRPM Limit: %d\nWhitelist: %s\n",
+		conf.Server.Https,
+		conf.Server.Certs,
 		conf.Server.Uri,
 		conf.RateLimit.Rpm,
 		conf.RateLimit.Whitelist)

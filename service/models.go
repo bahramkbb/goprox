@@ -11,7 +11,6 @@ type RateLimitConfiguration struct {
 }
 
 type ServerConfiguration struct {
-	Port int
 	Uri string
 	RedisUri string
 }

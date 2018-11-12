@@ -9,7 +9,7 @@ import (
 )
 
 // Serve a reverse proxy for a given url
-func Proxy(res http.ResponseWriter, req *http.Request) {
+func  Proxy(res http.ResponseWriter, req *http.Request) {
 	// parse the url
 	targetUrl, _ := url.Parse(Configs.Server.Uri)
 

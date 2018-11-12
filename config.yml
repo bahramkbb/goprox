@@ -1,7 +1,6 @@
 server:
-  port: 8000
   uri: https://www.bamilo.com
-  redisUri: redis
+  redisUri: 127.0.0.1
 
 ratelimit:
   rpm: 10
