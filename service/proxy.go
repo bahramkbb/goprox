@@ -1,7 +1,6 @@
 package service
 
 import (
-	"log"
 	"net"
 	"net/http"
 	"net/http/httputil"
@@ -10,6 +9,21 @@ import (
 
 // Serve a reverse proxy for a given url
 func  Proxy(res http.ResponseWriter, req *http.Request) {
+	//Process ip visit and create history
+	go processIpStats(req)
+
+	//Process blocked ips
+	ip, _, _ := net.SplitHostPort(req.RemoteAddr)
+	if PermanentBlackListIPs[ip] {
+		errResponse(res, http.StatusTooManyRequests,
+			"Too many requests in short time detected! You have been permanently blocked!")
+		return
+	} else if BlackListIPs[ip] {
+		errResponse(res, http.StatusTooManyRequests,
+			"Too many requests in short time detected! You have been temporary blocked!")
+		return
+	}
+
 	// parse the url
 	targetUrl, _ := url.Parse(Configs.Server.Uri)
 
@@ -25,15 +39,7 @@ func  Proxy(res http.ResponseWriter, req *http.Request) {
 	req.Header.Set("X-Forwarded-Host", req.Header.Get("Host"))
 	req.Host = targetUrl.Host
 
-	go processIpStats(req)
-
-	ip, _, _ := net.SplitHostPort(req.RemoteAddr)
-
-	if BlackListIPs[ip] {
-		log.Printf("IP: %s, You are blocked!!!!", ip)
-	}
-
-	//Adding Header example
+	//Adding GoProx Header
 	test := req.Header.Get("GoProx")
 	res.Header().Set("GoProx", "0.1" + test)
 
@@ -45,6 +51,7 @@ func processIpStats(r *http.Request) {
 	CacheClient.SaveVisit(ip)
 }
 
-//func changeIPAddress(r *http.Request) {
-//	r.RemoteAddr = "127.0.0.1"
-//}
+func errResponse(res http.ResponseWriter, code int, body string) {
+	res.WriteHeader(code)
+	res.Write([]byte(body))
+}

@@ -11,6 +11,7 @@ import (
 var Configs Configuration
 var WhiteListIPs map[string]bool
 var BlackListIPs map[string]bool
+var PermanentBlackListIPs map[string]bool
 var RequestFrequency int
 var CacheClient RedisClient
 
@@ -18,6 +19,7 @@ func Config(conf *Configuration){
 	//Initialize Maps
 	WhiteListIPs = make(map[string]bool)
 	BlackListIPs = make(map[string]bool)
+	PermanentBlackListIPs = make(map[string]bool)
 
 
 	viper.SetConfigName("config")
@@ -40,9 +42,7 @@ func loadConfig(conf *Configuration) {
 		log.Fatalf("unable to decode into struct, %v", err)
 	}
 
-	log.Printf("Running Https: %t\nCerts Location: %s\nTarget Url: %s\nRPM Limit: %d\nWhitelist: %s\n",
-		conf.Server.Https,
-		conf.Server.Certs,
+	log.Printf("Running Target Url: %s\nRPM Limit: %d\nWhitelist: %s\n",
 		conf.Server.Uri,
 		conf.RateLimit.Rpm,
 		conf.RateLimit.Whitelist)

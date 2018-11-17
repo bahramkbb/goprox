@@ -19,5 +19,5 @@ func main(){
 
 	go service.BlacklistProcessing()
 
-	log.Fatal(http.ListenAndServe(":80", nil))
+	log.Fatal(http.ListenAndServe(":8000", nil))
 }

@@ -48,7 +48,7 @@ func (rc *RedisClient) SaveVisit(ip string) (bool, error) {
 	conn.Send("MULTI")
 	conn.Send("INCR", "ip:" + ip)
 	conn.Send("PEXPIRE", "ip:" + ip, RequestFrequency)
-	conn.Send("SADD", "ips", ip)
+	conn.Send("SADD", "visitor_ips", ip)
 	res, err := conn.Do("EXEC")
 
 	if err != nil {
@@ -74,7 +74,7 @@ func (rc *RedisClient) AddIpToSet(ip string, setName string) (bool, error) {
 	}
 }
 
-func (rc *RedisClient) GetIpSet(setName string) []string {
+func (rc *RedisClient) GetSet(setName string) []string {
 	var ips []string
 
 	// Get a connection
@@ -88,6 +88,20 @@ func (rc *RedisClient) GetIpSet(setName string) []string {
 	}
 
 	return ips
+}
+
+func (rc *RedisClient) EmptySet(setName string) bool {
+	// Get a connection
+	conn := rc.pool.Get()
+	defer conn.Close()
+
+	if _, err := conn.Do("DEL", setName); err == nil {
+		return true
+	} else {
+		log.Printf("error deleting set from redis : %v", err)
+		return false
+	}
+
 }
 
 func (rc *RedisClient) GetIPVisitCount(ip string) int {

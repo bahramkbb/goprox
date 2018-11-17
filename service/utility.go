@@ -77,3 +77,12 @@ func gunzipWrite(w io.Writer, data []byte) error {
 	return nil
 }
 
+func convertStringArrayToMap(input []string) map[string]bool {
+	res := make(map[string]bool)
+
+	for _, val := range input {
+		res[val] = true
+	}
+
+	return res
+}
